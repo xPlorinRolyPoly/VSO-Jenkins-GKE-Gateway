@@ -1,0 +1,31 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nb-clone-internal-gateway
+  namespace: default
+spec:
+  gatewayClassName: gke-l7-rilb
+  addresses:
+  - type: NamedAddress
+    value: syst-nb-clone-static-ip
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: In
+                values:
+                  - ns-nb-clone-jenkins
+                  - ns-nb-clone-sonarqube
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: nb-clone-jenkins-tls
+          - kind: Secret
+            name: nb-clone-sonarqube-tls
