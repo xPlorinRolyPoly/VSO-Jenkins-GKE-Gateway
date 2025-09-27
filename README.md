@@ -23,15 +23,15 @@ This project provides a production-ready infrastructure setup that combines Hash
 ## Architecture
 
 ```
-Internet/VPC → GKE Gateway → Jenkins/SonarQube Pods
-                 ↑              ↑
-            TLS Certificates   Application Secrets
-                 ↑              ↑
-                 └──────────────┘
-                        ↑
-                Vault Secrets Operator
-                        ↑
-                   HashiCorp Vault
+Internet/VPC   ─→   GKE Gateway    ─→   Jenkins/SonarQube Pods
+                        ↑                       ↑
+                    TLS Certificates   Application Secrets
+                        ↑                       ↑
+                        └───────────────────────┘
+                                    ↑
+                            Vault Secrets Operator
+                                    ↑
+                              HashiCorp Vault
 ```
 
 The solution supports both external (public internet with IAP authentication) and internal (private VPC network) access patterns. VSO synchronizes both TLS certificates for the gateway and application secrets for Jenkins/SonarQube from Vault to Kubernetes secrets.
