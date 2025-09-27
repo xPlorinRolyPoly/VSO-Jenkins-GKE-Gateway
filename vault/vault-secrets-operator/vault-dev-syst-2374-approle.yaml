@@ -1,0 +1,17 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: vault-dev-syst-2374-approle-auth
+  namespace: vault-secrets-operator
+spec:
+  vaultConnectionRef: "vault-secrets-operator/vault-dev-connection"
+  namespace: "sandbox-alpana"
+  allowedNamespaces:
+    - "default"
+    - "ns-nb-clone-jenkins"
+    - "ns-nb-clone-sonarqube"
+  method: appRole
+  mount: syst-2374-approle
+  appRole:
+    roleId: <YOUR_VAULT_APPROLE_ROLE_ID_HERE>
+    secretRef: "vault-dev-syst-2374-approle-secret-id"

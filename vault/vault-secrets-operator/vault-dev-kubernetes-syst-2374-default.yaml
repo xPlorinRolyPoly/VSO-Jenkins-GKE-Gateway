@@ -1,0 +1,15 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: vault-dev-kubernetes-syst-2374-default-auth
+  namespace: vault-secrets-operator
+spec:
+  vaultConnectionRef: "vault-secrets-operator/vault-dev-connection"
+  namespace: "sandbox-alpana"
+  allowedNamespaces:
+    - "default"
+  method: kubernetes
+  mount: kubernetes-syst-2374-default
+  kubernetes:
+    role: "syst-2374-reader-role"
+    serviceAccount: "vault-auth"

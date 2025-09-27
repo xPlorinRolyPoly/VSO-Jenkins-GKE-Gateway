@@ -15,16 +15,23 @@ The vault setup provides:
 
 ```
 vault/
-├── vault-auth-seup.sh           # Main setup script for Vault authentication
-├── syst-2374-policy.hcl        # Vault policy defining access permissions
-└── k8s/                         # Kubernetes manifests
-    ├── namespaces/
-    │   ├── ns-nb-clone-jenkins.yaml     # Jenkins namespaces
-    │   └── ns-nb-clone-sonarqube.yaml   # SonarQube namespace
-    └── service-accounts/
-        ├── default.yaml                  # Default namespace service account
-        ├── ns-nb-clone-jenkins.yaml     # Jenkins service account
-        └── ns-nb-clone-sonarqube.yaml   # SonarQube service account
+├── vault-auth-seup.sh                                 # Main setup script for Vault authentication
+├── syst-2374-policy.hcl                               # Vault policy defining access permissions
+├── k8s/                                               # Kubernetes manifests
+│   ├── namespaces/
+│   │   ├── ns-nb-clone-jenkins.yaml                   # Jenkins namespaces
+│   │   └── ns-nb-clone-sonarqube.yaml                 # SonarQube namespace
+│   └── service-accounts/
+│       ├── default.yaml                               # Default namespace service account
+│       ├── ns-nb-clone-jenkins.yaml                   # Jenkins service account
+│       └── ns-nb-clone-sonarqube.yaml                 # SonarQube service account
+└── vault-secrets-operator/                            # Vault Secrets Operator (VSO) configurations
+    ├── vault-secrets-operator.sh                      # VSO installation and setup script
+    ├── vault-dev-connection.yaml                      # VSO Vault connection configuration
+    ├── vault-dev-syst-2374-approle.yaml               # AppRole authentication for VSO
+    ├── vault-dev-kubernetes-syst-2374-default.yaml    # Default namespace auth
+    ├── vault-dev-kubernetes-syst-2374-jenkins.yaml    # Jenkins namespace auth
+    └── vault-dev-kubernetes-syst-2374-sonarqube.yaml  # SonarQube namespace auth
 ```
 
 ## Prerequisites
@@ -39,6 +46,8 @@ Before running the setup script, ensure you have:
    - `kubectl` CLI tool
    - `jq` for JSON processing
    - `base64` utility
+   - `helm` CLI tool (for VSO deployment)
+   - `gcloud` CLI tool (for GKE operations)
 
 ## Configuration
 
@@ -304,17 +313,109 @@ Use Vault CLI to verify the setup:
 - Check Kubernetes authentication configuration for each namespace
 - Test authentication using service account tokens with the configured roles
 
+## Vault Secrets Operator (VSO) Integration
+
+The [`vault-secrets-operator/`](./vault-secrets-operator/) directory contains the Kubernetes-native Vault Secrets Operator configuration that provides automatic secret synchronization from Vault to Kubernetes secrets.
+
+### VSO Components
+
+#### Installation and Setup
+The [`vault-secrets-operator.sh`](./vault-secrets-operator/vault-secrets-operator.sh) script handles:
+- **Helm Installation**: Deploys VSO v0.10.0 using HashiCorp's official Helm chart
+- **GKE Configuration**: Sets up Google Cloud project and authentication
+- **Namespace Creation**: Creates dedicated `vault-secrets-operator` namespace
+- **Custom Configuration**: Disables default connections to use custom auth methods
+- **Secret Management**: Creates and manages AppRole secret-id as Kubernetes secret
+
+#### Vault Connection Configuration
+The [`vault-dev-connection.yaml`](./vault-secrets-operator/vault-dev-connection.yaml) defines:
+- **Connection Specification**: Establishes connection to Vault server
+- **Address Configuration**: Points to the Vault server endpoint
+- **Namespace Scope**: Deployed in `vault-secrets-operator` namespace for centralized management
+
+#### Authentication Methods
+The VSO setup creates multiple VaultAuth resources corresponding to each authentication method configured in the main setup:
+
+##### AppRole Authentication
+[`vault-dev-syst-2374-approle.yaml`](./vault-secrets-operator/vault-dev-syst-2374-approle.yaml) provides:
+- **Multi-namespace Access**: Allows secrets access across default, Jenkins, and SonarQube namespaces
+- **Role-based Authentication**: Uses the `syst-2374-approle` mount point
+- **Secret Reference**: References Kubernetes secret containing AppRole secret-id
+- **Vault Namespace**: Targets `sandbox-alpana` namespace in Vault
+
+##### Kubernetes Authentication - Default
+[`vault-dev-kubernetes-syst-2374-default.yaml`](./vault-secrets-operator/vault-dev-kubernetes-syst-2374-default.yaml) configures:
+- **Default Namespace Binding**: Scoped to `default` namespace only
+- **Service Account Integration**: Uses `vault-auth` service account
+- **Mount Point Mapping**: Connects to `kubernetes-syst-2374-default` auth method
+- **Role Assignment**: Uses `syst-2374-reader-role` with read-only permissions
+
+##### Kubernetes Authentication - Jenkins
+[`vault-dev-kubernetes-syst-2374-jenkins.yaml`](./vault-secrets-operator/vault-dev-kubernetes-syst-2374-jenkins.yaml) provides:
+- **Jenkins Namespace Isolation**: Restricted to `ns-nb-clone-jenkins` namespace
+- **CI/CD Integration**: Enables automated secret provisioning for Jenkins workloads
+- **Service Account Binding**: Leverages existing `vault-auth` service account
+- **Authentication Mount**: Maps to `kubernetes-syst-2374-jenkins` auth method
+
+##### Kubernetes Authentication - SonarQube
+[`vault-dev-kubernetes-syst-2374-sonarqube.yaml`](./vault-secrets-operator/vault-dev-kubernetes-syst-2374-sonarqube.yaml) enables:
+- **SonarQube Namespace Scope**: Limited to `ns-nb-clone-sonarqube` namespace
+- **Code Quality Integration**: Supports automated secret management for SonarQube
+- **Consistent Service Account**: Uses the same `vault-auth` pattern
+- **Dedicated Mount Point**: Connects to `kubernetes-syst-2374-sonarqube` auth method
+
+### VSO Benefits
+
+#### Automated Secret Management
+- **Dynamic Synchronization**: Automatically syncs Vault secrets to Kubernetes secrets
+- **Declarative Configuration**: Uses Kubernetes CRDs for secret specification
+- **Lifecycle Management**: Handles secret creation, updates, and deletion
+- **Error Handling**: Provides status reporting and error recovery
+
+#### Security Enhancements
+- **Namespace Isolation**: Each auth method is scoped to specific namespaces
+- **Service Account Integration**: Leverages existing RBAC and service account setup
+- **Policy Enforcement**: Respects Vault policies defined in the main authentication setup
+- **Audit Trail**: Maintains audit logs for secret access and operations
+
+#### Operational Efficiency
+- **Kubernetes Native**: Uses standard Kubernetes resources and patterns
+- **GitOps Compatible**: All configurations are version-controlled and declarative
+- **Monitoring Integration**: Provides metrics and status information
+- **Multi-tenancy**: Supports multiple authentication methods and namespaces
+
+### VSO Deployment Process
+
+The deployment follows this sequence:
+1. **Helm Installation**: Deploy VSO operator to the cluster
+2. **Connection Setup**: Create VaultConnection resource pointing to Vault server
+3. **Secret Creation**: Deploy AppRole secret-id as Kubernetes secret
+4. **Auth Configuration**: Apply VaultAuth resources for each authentication method
+5. **Verification**: Confirm VSO can authenticate and access Vault secrets
+
+### Integration with Main Setup
+
+The VSO configuration is designed to work seamlessly with the main Vault authentication setup:
+- **Reuses Authentication Methods**: Leverages auth methods created by `vault-auth-seup.sh`
+- **Maintains Entity Optimization**: Preserves the single-entity client count optimization
+- **Consistent Naming**: Uses the same service accounts and role names
+- **Policy Compliance**: Operates within the permissions defined by `syst-2374-policy`
+
 ## Integration
 
 This Vault setup integrates with:
-- **Jenkins**: Provides secure access to CI/CD secrets
-- **SonarQube**: Enables secure configuration management
+- **Jenkins**: Provides secure access to CI/CD secrets through direct authentication and VSO
+- **SonarQube**: Enables secure configuration management with automated secret provisioning
 - **GKE Gateway**: Supports certificate and credential management
-- **Vault Secrets Operator**: Enables automatic secret synchronization
+- **Vault Secrets Operator**: Provides Kubernetes-native automatic secret synchronization and lifecycle management
+- **Google Cloud Platform**: Integrates with GKE clusters and GCP identity services
 
 ## Maintenance
 
 - **Token Rotation**: Service account tokens auto-rotate based on TTL
 - **Policy Updates**: Modify `syst-2374-policy.hcl` and reapply as needed
 - **Access Review**: Regularly audit entity aliases and authentication methods
-- **Cleanup**: Remove temporary credential files after setup completion
+- **VSO Updates**: Monitor VSO operator versions and update using Helm when needed
+- **Secret Synchronization**: Monitor VSO secret synchronization status and troubleshoot any failures
+- **GKE Cluster Updates**: Ensure VSO compatibility when upgrading GKE cluster versions
+- **Cleanup**: Remove temporary credential files after setup completion and unused VSO resources
