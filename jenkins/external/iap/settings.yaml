@@ -1,0 +1,4 @@
+accessSettings:
+  allowed_domains_settings:
+    enable: true
+    domains: ["jenkins-clone.brm.gcp.skycdp.de", "jenkins-clone.brm.skycdp.de"]
