@@ -251,12 +251,14 @@ kubectl get rolebinding -n ns-nb-clone-jenkins | grep nb-clone-jenkins
 
 ```
 jenkins/
-├── saml-override-values.yaml           # Main Helm values with sidecar config
-├── 5-configure-jenkins-external.sh     # Deployment script
-└── README-Jenkins-Vault-AutoReload.md  # This documentation
+├── saml-override-values.yaml            # Main Helm values with sidecar config
+├── configure-jenkins-external.sh        # Deployment script
+├── configure-jenkins-internal.sh        # Deployment script
+└── README.md                            # This documentation
 
-vault/vault-secrets-operator/
-└── vault-dev-secret-syst-2374-jenkins-creds.yaml  # VaultStaticSecret config
+vault/
+├── vault-dev-secret-syst-2374-jenkins-iap.yaml     # VaultStaticSecret config
+└── vault-dev-secret-syst-2374-jenkins-creds.yaml   # VaultStaticSecret config
 ```
 
 ## Version Information
