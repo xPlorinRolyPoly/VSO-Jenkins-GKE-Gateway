@@ -1,0 +1,20 @@
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: nb-clone-sonarqube-internal
+  namespace: ns-nb-clone-sonarqube
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: nb-clone-sonarqube-internal
+  default:
+    checkIntervalSec: 15
+    timeoutSec: 15
+    healthyThreshold: 1
+    unhealthyThreshold: 2
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 9000
+        requestPath: /api/system/status

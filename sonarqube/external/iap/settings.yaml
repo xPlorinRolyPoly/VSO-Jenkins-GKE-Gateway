@@ -1,0 +1,4 @@
+accessSettings:
+  allowed_domains_settings:
+    enable: true
+    domains: ["sonarqube-clone.brm.skycdp.de", "sonarqube-clone.brm.gcp.skycdp.de"]
