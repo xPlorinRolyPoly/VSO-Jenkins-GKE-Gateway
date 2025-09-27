@@ -213,19 +213,19 @@ The `configure-gateway-internal.sh` script configures internal network access:
 - Target tags: Specific GKE node pool identifiers for precise access control
 
 **Internal Load Balancer Access:**
-- Health checks from proxy-only subnet range (10.163.25.0/26)
+- Health checks from proxy-only subnet range
 - Same target tags ensuring consistent node pool access
 - Regional scope limiting access to specific geographic region
 
 #### DNS Management Strategy
 **Public DNS Configuration:**
-- Managed zone: `de-nb-ns-dn-mz-brm-gcp-skycdp-de`
+- Managed zone
 - Jenkins record: `jenkins-clone.brm.gcp.skycdp.de`
 - SonarQube record: `sonarqube-clone.brm.gcp.skycdp.de`
 - TTL: 300 seconds for reasonable caching with update flexibility
 
 **Private DNS Configuration:**
-- Managed zone: `de-nb-ns-dn-mz-brm-gcp-internal-skycdp-de` 
+- Managed zone
 - Jenkins internal record: `jenkins-clone.brm.gcp.internal.skycdp.de`
 - SonarQube internal record: `sonarqube-clone.brm.gcp.internal.skycdp.de`
 - Regional internal load balancer IP resolution
