@@ -12,8 +12,8 @@ export K8S_RESOURCE_PREFIX_SONARQUBE="${K8S_RESOURCE_PREFIX}-sonarqube"
 export JENKINS_PORT=8080
 export SONARQUBE_PORT=9000
 export MANAGED_ZONE_NAME=<YOUR_MANAGED_ZONE_NAME>
-export JENKINS_GCP_DNS_RECORD_NAME="jenkins-clone.brm.gcp.skycdp.de."
-export SONARQUBE_GCP_DNS_RECORD_NAME="sonarqube-clone.brm.gcp.skycdp.de."
+export JENKINS_GCP_DNS_RECORD_NAME="jenkins-clone.prod.example.de."
+export SONARQUBE_GCP_DNS_RECORD_NAME="sonarqube-clone.prod.example.de."
 
 gcloud config configurations activate <YOUR_GCLOUD_CONFIG_PROFILE>
 gcloud config set project $NETWORK_PROJECT_ID

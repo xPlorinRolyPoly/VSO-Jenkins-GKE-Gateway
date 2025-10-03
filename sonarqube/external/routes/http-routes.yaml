@@ -9,8 +9,8 @@ spec:
       namespace: default
       sectionName: sonarqube
   hostnames:
-    - "sonarqube-clone.brm.skycdp.de"
-    - "sonarqube-clone.brm.gcp.skycdp.de"
+    - "sonarqube-clone.dev.example.de"
+    - "sonarqube-clone.prod.example.de"
   rules:
     - matches:
         - path:

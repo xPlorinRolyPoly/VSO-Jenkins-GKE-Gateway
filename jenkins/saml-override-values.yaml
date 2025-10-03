@@ -22,7 +22,7 @@ controller:
   agentListenerEnabled: false
   image:
     tag: 2.504.1-alpine
-  jenkinsUrl: https://jenkins-clone.brm.skycdp.de/
+  jenkinsUrl: https://jenkins-clone.dev.example.de/
   #jenkinsUrl: http://localhost:8080/
   javaOpts: >-
     -Duser.timezone=Europe/Berlin

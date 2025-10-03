@@ -220,8 +220,8 @@ The `configure-gateway-internal.sh` script configures internal network access:
 #### DNS Management Strategy
 **Public DNS Configuration:**
 - Managed zone
-- Jenkins record: `jenkins-clone.brm.gcp.skycdp.de`
-- SonarQube record: `sonarqube-clone.brm.gcp.skycdp.de`
+- Jenkins record: `jenkins-clone.prod.example.de`
+- SonarQube record: `sonarqube-clone.prod.example.de`
 - TTL: 300 seconds for reasonable caching with update flexibility
 
 **Private DNS Configuration:**

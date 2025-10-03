@@ -9,8 +9,8 @@ spec:
       namespace: default
       sectionName: jenkins
   hostnames:
-    - "jenkins-clone.brm.skycdp.de"
-    - "jenkins-clone.brm.gcp.skycdp.de"
+    - "jenkins-clone.dev.example.de"
+    - "jenkins-clone.prod.example.de"
   rules:
     - matches:
         - path:

@@ -61,5 +61,5 @@ sonarProperties:
   sonar.forceAuthentication: true
   sonar.auth.saml.enabled: true
   sonar.auth.saml.providerName: SSO
-  sonar.core.serverBaseURL: "https://sonarqube-clone.brm.skycdp.de"
+  sonar.core.serverBaseURL: "https://sonarqube-clone.dev.example.de"
 sonarSecretProperties: nb-clone-sonarqube-properties
