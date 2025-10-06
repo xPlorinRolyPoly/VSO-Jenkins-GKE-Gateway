@@ -20,4 +20,4 @@ kubectl apply -f internal/svc/
 kubectl apply -f internal/routes/
 kubectl apply -f internal/policies/
 
-gcloud compute ssh --project $PROJECT_ID "${PROJECT_SHORT_NAME}-bastion-brm" --zone "europe-west3-b" --command "curl -v https://sonarqube-clone.brm.gcp.internal.skycdp.de"
+gcloud compute ssh --project $PROJECT_ID "${PROJECT_SHORT_NAME}-bastion-brm" --zone "europe-west3-b" --command "curl -v https://sonarqube-clone.dev.internal.example.de"

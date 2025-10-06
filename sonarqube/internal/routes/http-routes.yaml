@@ -8,7 +8,7 @@ spec:
   - name: nb-clone-internal-gateway
     namespace: default
   hostnames:
-  - "sonarqube-clone.brm.gcp.internal.skycdp.de"
+  - "sonarqube-clone.dev.internal.example.de"
   rules:
   - matches:
     - path:

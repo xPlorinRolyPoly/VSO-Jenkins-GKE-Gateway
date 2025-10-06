@@ -226,8 +226,8 @@ The `configure-gateway-internal.sh` script configures internal network access:
 
 **Private DNS Configuration:**
 - Managed zone
-- Jenkins internal record: `jenkins-clone.brm.gcp.internal.skycdp.de`
-- SonarQube internal record: `sonarqube-clone.brm.gcp.internal.skycdp.de`
+- Jenkins internal record: `jenkins-clone.dev.internal.example.de`
+- SonarQube internal record: `sonarqube-clone.dev.internal.example.de`
 - Regional internal load balancer IP resolution
 
 ## How It Works

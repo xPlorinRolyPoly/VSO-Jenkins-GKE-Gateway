@@ -24,6 +24,6 @@ gcloud compute ssh --project $PROJECT_ID $PROJECT_SHORT_NAME-bastion-brm --zone 
 
 STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" \
   --user "<YOUR_JENKINS_USERNAME_HERE>:<YOUR_JENKINS_API_TOKEN_HERE>" \
-  "https://jenkins-clone.brm.gcp.internal.skycdp.de/")
+  "https://jenkins-clone.dev.internal.example.de/")
 
 echo "Jenkins HTTP Status Code: $STATUS_CODE"

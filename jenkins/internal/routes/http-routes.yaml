@@ -8,7 +8,7 @@ spec:
   - name: nb-clone-internal-gateway
     namespace: default
   hostnames:
-  - "jenkins-clone.brm.gcp.internal.skycdp.de"
+  - "jenkins-clone.dev.internal.example.de"
   rules:
   - matches:
     - path:
