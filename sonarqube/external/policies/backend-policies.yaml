@@ -1,0 +1,30 @@
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: nb-clone-sonarqube-protected
+  namespace: ns-nb-clone-sonarqube
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: nb-clone-sonarqube-protected
+  default:
+    securityPolicy: de-nb-sc-cp-akamai-siteshield-prod
+    iap:
+      enabled: true
+      clientID: <YOUR_OAUTH2_CLIENT_ID>
+      oauth2ClientSecret:
+        name: nb-clone-sonarqube-iap
+---
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: nb-clone-sonarqube
+  namespace: ns-nb-clone-sonarqube
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: nb-clone-sonarqube
+  default:
+    securityPolicy: de-nb-sc-cp-akamai-siteshield-prod

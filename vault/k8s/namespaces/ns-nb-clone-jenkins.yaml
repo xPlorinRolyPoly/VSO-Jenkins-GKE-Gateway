@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-nb-clone-jenkins
+  labels:
+    name: ns-nb-clone-jenkins
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-nb-clone-jenkins-workers
+  labels:
+    name: ns-nb-clone-jenkins-workers

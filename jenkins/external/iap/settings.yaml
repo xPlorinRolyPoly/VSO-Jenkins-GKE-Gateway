@@ -1,0 +1,4 @@
+accessSettings:
+  allowed_domains_settings:
+    enable: true
+    domains: ["jenkins-clone.prod.example.de", "jenkins-clone.dev.example.de"]

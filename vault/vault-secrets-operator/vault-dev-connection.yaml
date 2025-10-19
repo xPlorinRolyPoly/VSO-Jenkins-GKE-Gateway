@@ -1,0 +1,7 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: vault-dev-connection
+  namespace: vault-secrets-operator
+spec:
+  address: <YOUR_VAULT_ADDR_HERE>

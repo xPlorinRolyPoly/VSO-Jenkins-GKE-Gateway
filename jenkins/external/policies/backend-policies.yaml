@@ -1,0 +1,30 @@
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: nb-clone-jenkins-protected
+  namespace: ns-nb-clone-jenkins
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: nb-clone-jenkins-protected
+  default:
+    securityPolicy: de-nb-sc-cp-akamai-siteshield-prod
+    iap:
+      enabled: true
+      clientID: <YOUR_OAUTH2_CLIENT_ID_HERE>
+      oauth2ClientSecret:
+        name: nb-clone-jenkins-iap
+---
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: nb-clone-jenkins
+  namespace: ns-nb-clone-jenkins
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: nb-clone-jenkins
+  default:
+    securityPolicy: de-nb-sc-cp-akamai-siteshield-prod

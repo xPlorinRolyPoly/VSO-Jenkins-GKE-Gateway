@@ -1,0 +1,248 @@
+# https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/values.yaml
+namespaceOverride: ns-nb-clone-jenkins
+persistence:
+  enabled: true
+rbac:
+  create: true
+  readSecrets: true
+  # Additional RBAC rules for config-reload sidecar to watch secrets
+  additionalRules:
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get", "list", "watch"]
+agent:
+  namespace: ns-nb-clone-jenkins-workers
+  websocket: true
+controller:
+  admin:
+    createSecret: false
+    existingSecret: nb-clone-jenkins-credentials
+    userKey: jenkins-admin-user
+    passwordKey: jenkins-admin-password
+  agentListenerEnabled: false
+  image:
+    tag: 2.504.1-alpine
+  jenkinsUrl: https://jenkins-clone.dev.example.de/
+  #jenkinsUrl: http://localhost:8080/
+  javaOpts: >-
+    -Duser.timezone=Europe/Berlin
+    -Djava.awt.headless=true
+    -XX:+UseContainerSupport
+    -XX:+UseStringDeduplication
+  initializeOnce: true
+  overwritePlugins: true
+  containerEnv:
+    - name: TZ
+      value: "Europe/Berlin"
+  # Configure the default config auto-reload sidecar to also watch secrets
+  sidecars:
+    configAutoReload:
+      enabled: true
+      env:
+        # Add RESOURCE=both to watch both configmaps and secrets
+        - name: RESOURCE
+          value: "both"
+        # Reduce polling interval to detect changes faster (default is 60s)
+        - name: SLEEP
+          value: "10"
+        # Enable more verbose logging to debug
+        - name: LOG_LEVEL
+          value: "INFO"
+  installPlugins:
+    - authorize-project:2.0.0
+    - basic-branch-build-strategies:228.v68c089762a_db_
+    - blueocean:1.27.19
+    - blueocean-jira:1.27.19
+    - build-timeout:1.38
+    - buildtriggerbadge:251.vdf6ef853f3f5
+    - command-launcher:123.v37cfdc92ef67
+    - configuration-as-code:1985.vdda_32d0c4ea_b_
+    - cloudbees-disk-usage-simple:241.v0ea_d9a_a_96ee8
+    - cucumber-reports:5.8.5
+    - docker-workflow:611.v16e84da_6d3ff
+    - email-ext:1876.v28d8d38315b_d
+    - extended-choice-parameter:388.ve7b_d0b_920e10
+    - generic-webhook-trigger:2.3.1
+    - google-oauth-plugin:1.335.ve6de40e2db_18
+    - github:1.43.0
+    - hashicorp-vault-pipeline:1.4
+    - jaxb:2.3.9-133.vb_ec76a_73f706
+    - jdk-tool:83.v417146707a_3d
+    - job-dsl:1.92
+    - jquery-detached:1.2.1
+    - kubernetes:4371.vb_33b_086d54a_1
+    - ldap:780.vcb_33c9a_e4332
+    - lighthouse-report:1.3.0
+    - lockable-resources:1349.v8b_ccb_c5487f7
+    - matrix-auth:3.2.6
+    - mercurial:1309.v6802b_f0efb_b_9
+    - performance:984.v7a_a_a_123a_a_952
+    - pipeline-github:2.8-162.382498405fdc
+    - pipeline-stage-view:2.38
+    - pipeline-utility-steps:2.19.0
+    - prometheus:819.v50953a_c560dd
+    - role-strategy:756.v978cb_392eb_d3
+    - run-condition:243.v3c3f94e46a_8b_
+    - saml:4.525.v4f6a_7209447e
+    - sonar:2.18
+    - splunk-devops:1.10.2
+    - strict-crumb-issuer:2.1.1
+    - timestamper:1.28
+    - uno-choice:2.8.8
+    - workflow-aggregator:608.v67378e9d3db_1
+    - workflow-remote-loader:1.6
+  JCasC:
+    enabled: true
+    configScripts:
+      casc: |
+        jenkins:
+          authorizationStrategy:
+            roleBased:
+              roles:
+                global:
+                - entries:
+                    - group: <YOUR_LEGACY_READER_GROUP_ID_HERE>
+                  name: "legacy-reader"
+                  pattern: ".*"
+                  permissions:
+                  - "Job/Read"
+                  - "Job/Workspace"
+                  - "View/Read"
+                  - "Credentials/View"
+                  - "Agent/Connect"
+                - entries:
+                    - group: <YOUR_ADMIN_GROUP_ID_HERE>
+                  name: "admin"
+                  pattern: ".*"
+                  permissions:
+                  - "Overall/Administer"
+                - entries:
+                    - user: "admin"
+                  name: "local-admin"
+                  pattern: ".*"
+                  permissions:
+                  - "Overall/Administer"
+                - entries:
+                    - group: "authenticated"
+                    - group: <YOUR_OVERALL_READ_GROUP_ID_HERE>
+                  name: "overall-read"
+                  pattern: ".*"
+                  permissions:
+                  - "Overall/Read"
+                - entries:
+                    - group: <YOUR_METRICS_READER_GROUP_ID_HERE>
+                  name: "metrics-reader"
+                  pattern: ".*"
+                  permissions:
+                  - "Metrics/View"
+                - entries:
+                    - group: <YOUR_AGENT_EXECUTOR_GROUP_ID_1_HERE>
+                    - group: <YOUR_AGENT_EXECUTOR_GROUP_ID_2_HERE>
+                  name: "agent-executor"
+                  pattern: ".*"
+                  permissions:
+                  - "Agent/Build"
+                  - "Agent/Connect"
+                items:
+                - entries:
+                    - group: <YOUR_RUNNER_GROUP_ID_1_HERE>
+                    - group: <YOUR_RUNNER_GROUP_ID_2_HERE>
+                  name: "runner"
+                  pattern: "(?!Jobs/QAScripts/).*"
+                  permissions:
+                  - "Job/Cancel"
+                  - "Job/Build"
+                  - "Run/Update"
+                  - "Job/Read"
+                  - "Agent/Build"
+                - entries:
+                    - group: <YOUR_BRM_JOBS_EDITOR_GROUP_ID_1_HERE>
+                  name: "brm-jobs-editor"
+                  pattern: "Jobs(?!/QAScripts).*"
+                  permissions:
+                  - "Job/Create"
+                  - "Job/Delete"
+                  - "Job/Configure"
+                  - "Job/Read"
+                - entries:
+                    - group: <YOUR_QA_SCRIPTS_RUNNER_GROUP_ID_HERE>
+                  name: "qa-scripts-runner"
+                  pattern: "Jobs|Jobs/QAScripts|Jobs/QAScripts/.*"
+                  permissions:
+                  - "Job/Cancel"
+                  - "Job/Build"
+                  - "Job/Read"
+          securityRealm:
+            saml:
+              advancedConfiguration:
+                forceAuthn: false
+                spEntityId: <YOUR_SP_ENTITY_ID_HERE>
+              binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+              displayNameAttributeName: "http://schemas.microsoft.com/identity/claims/displayname"
+              emailAttributeName: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+              groupsAttributeName: "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups"
+              idpMetadataConfiguration:
+                period: 0
+                url: <YOUR_IDP_METADATA_URL_HERE>
+              logoutUrl: "https://login.microsoftonline.com/common/wsfederation?wa=wsignout1.0"
+              maximumAuthenticationLifetime: 432000
+              usernameAttributeName: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+              usernameCaseConversion: "none"
+        credentials:
+          system:
+            domainCredentials:
+            - credentials:
+              - vaultAppRoleCredential:
+                  description: "Reader approle for engine program-shared in ns /sky-de/sales-service/shared"
+                  id: "vault_sky-de--sales-service--shared--program-shared_reader"
+                  namespace: "/sky-de/sales-service/shared"
+                  path: "approle"
+                  roleId: "${readFile:/var/jenkins_home/casc_configs/vault_sky-de--sales-service--shared--program-shared_reader_roleid}"
+                  scope: GLOBAL
+                  secretId: "${readFile:/var/jenkins_home/casc_configs/vault_sky-de--sales-service--shared--program-shared_reader_secretid}"
+              - vaultAppRoleCredential:
+                  description: "Reader approle for engine program-shared in ns /sky-de/sales-service/shared in the NON-PROD Vault"
+                  id: "vault_nonprod_sky-de--sales-service--shared--program-shared_reader"
+                  namespace: "/sky-de/sales-service/shared"
+                  path: "approle"
+                  roleId: "${readFile:/var/jenkins_home/casc_configs/vault_nonprod_sky-de--sales-service--shared--program-shared_reader_roleid}"
+                  scope: GLOBAL
+                  secretId: "${readFile:/var/jenkins_home/casc_configs/vault_nonprod_sky-de--sales-service--shared--program-shared_reader_secretid}"
+              - string:
+                  scope: GLOBAL
+                  id: "github-token"
+                  secret: "${readFile:/var/jenkins_home/casc_configs/githubApp_AccessToken}"
+              - string:
+                  id: "sonarqube-scanner-token"
+                  scope: GLOBAL
+                  secret: "${readFile:/var/jenkins_home/casc_configs/jenkins_sonarqube_scanner_token}"
+              - string:
+                  scope: GLOBAL
+                  id: "sonarqube-qualitymanager-token"
+                  secret: ${readFile:/var/jenkins_home/casc_configs/jenkins_sonarqube_qualitymanager_token}
+              - string:
+                  id: "sonarqube-webhook-secret"
+                  scope: GLOBAL
+                  secret: "${readFile:/var/jenkins_home/casc_configs/sonarqube_jenkins_callback_secret}"
+              - string:
+                  id: "alpana-secret-key"
+                  scope: GLOBAL
+                  secret: "${readFile:/var/jenkins_home/casc_configs/alpana-secret-key}"
+        unclassified:
+          hashicorpVault:
+            configuration:
+              engineVersion: 2
+              timeout: 60
+              vaultCredentialId: "vault_sky-de--sales-service--shared--infrastructure-reader"
+              vaultNamespace: "/sky-de/sales-service/shared"
+              vaultUrl: <YOUR_VAULT_URL_HERE>
+          sonarGlobalConfiguration:
+            buildWrapperEnabled: false
+            installations:
+            - credentialsId: "sonarqube-scanner-token"
+              name: "BRM-Sonarqube-Clone"
+              serverUrl: "http://nb-clone-sonarqube.ns-nb-clone-sonarqube.svc.cluster.local:9000"
+              triggers:
+                skipScmCause: false
+                skipUpstreamCause: false
+              webhookSecretId: "sonarqube-webhook-secret"

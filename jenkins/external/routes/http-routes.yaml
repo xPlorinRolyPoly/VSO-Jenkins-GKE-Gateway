@@ -1,0 +1,30 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nb-clone-jenkins
+  namespace: ns-nb-clone-jenkins
+spec:
+  parentRefs:
+    - name: nb-clone-jenkins-gateway
+      namespace: default
+      sectionName: jenkins
+  hostnames:
+    - "jenkins-clone.dev.example.de"
+    - "jenkins-clone.prod.example.de"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /prometheus/
+        - path:
+            type: PathPrefix
+            value: /github-webhook/
+        - path:
+            type: PathPrefix
+            value: /securityRealm/finishLogin/
+      backendRefs:
+        - name: nb-clone-jenkins
+          port: 8080
+    - backendRefs:
+        - name: nb-clone-jenkins-protected
+          port: 8080

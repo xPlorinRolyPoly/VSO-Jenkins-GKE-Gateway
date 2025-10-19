@@ -1,0 +1,65 @@
+namespaceOverride: ns-nb-clone-sonarqube
+
+#edition: developer # Enables the Developer edition of SonarQube
+community:
+  enabled: true  # Enables the community edition of SonarQube
+  # buildNumber: "25.5.0.107428"
+
+image:
+  repository: "<YOUR_ARTIFACT_REGISTRY_HOST>/<YOUR_PROJECT_ID>/syst-2374/sonarqube"
+  tag: "25.5.0.107428-community"
+  pullPolicy: Always  # Always pull the latest image
+
+serviceAccount:
+  create: true  # Creates a service account for SonarQube
+  name: nb-clone-sonarqube  # Name of the service account
+  annotations:
+    iam.gke.io/gcp-service-account: "syst-2374-nb-clone-sonarqube@<YOUR_PROJECT_ID>.iam.gserviceaccount.com"  # GCP service account for Cloud SQL access
+
+monitoringPasscode: "yourPasscode"  # Required for monitoring, replace with your passcode
+
+persistence:
+  enabled: true  # Enables persistence for SonarQube data
+
+postgresql:
+  enabled: false  # Deploys a PostgreSQL database for testing
+  # postgresqlUsername: sonarqube
+  # postgresqlPassword: sonarqube
+  # postgresqlDatabase: sonarqube
+
+extraContainers:
+  - name: cloud-sql-proxy
+    image: "gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1"
+    args:
+      - "<YOUR_PROJECT_ID>:europe-west3:syst-2374-nb-clone-sq-in-psql"
+      - "--port=5432"
+      - "--private-ip"
+    securityContext:
+      runAsNonRoot: true # Recommended for security
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+setAdminPassword:
+  passwordSecretName: "nb-clone-sonarqube-admin"
+  passwordSecretKey: "password"
+  currentPasswordSecretKey: "currentPassword"
+
+jdbcOverwrite:
+  enabled: true
+  jdbcUrl: "jdbc:postgresql://localhost:5432/sonarqube_db"
+  jdbcUsername: "sonarqube_user"
+  jdbcSecretName: "nb-clone-sonarqube-db"
+  jdbcSecretPasswordKey: "password"
+
+sonarProperties:
+  sonar.telemetry.enable: false
+  sonar.forceAuthentication: true
+  sonar.auth.saml.enabled: true
+  sonar.auth.saml.providerName: SSO
+  sonar.core.serverBaseURL: "https://sonarqube-clone.dev.example.de"
+sonarSecretProperties: nb-clone-sonarqube-properties

@@ -1,0 +1,43 @@
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: nb-clone-jenkins
+  namespace: ns-nb-clone-jenkins
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: nb-clone-jenkins
+  default:
+    checkIntervalSec: 15
+    timeoutSec: 15
+    healthyThreshold: 1
+    unhealthyThreshold: 2
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 8080
+        requestPath: /login
+
+---
+
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: nb-clone-jenkins-protected
+  namespace: ns-nb-clone-jenkins
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: nb-clone-jenkins-protected
+  default:
+    checkIntervalSec: 15
+    timeoutSec: 15
+    healthyThreshold: 1
+    unhealthyThreshold: 2
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 8080
+        requestPath: /login

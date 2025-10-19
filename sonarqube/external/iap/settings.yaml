@@ -1,0 +1,4 @@
+accessSettings:
+  allowed_domains_settings:
+    enable: true
+    domains: ["sonarqube-clone.dev.example.de", "sonarqube-clone.prod.example.de"]
